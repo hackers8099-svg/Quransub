@@ -11,7 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Zip-ka wuu furayaa, kadibna faylasha folder-ka gudihiisa ayuu root-ka ku keenayaa
       - name: Unzip project
         run: |
           if [ -f quran_caption.zip ]; then
@@ -29,6 +28,14 @@ jobs:
           if [ ! -d android ]; then
             flutter create --project-name quran_caption --platforms=android .
           fi
+
+      - name: Add INTERNET permission
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          if ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+            sed -i '0,/<manifest[^>]*>/s//&\n    <uses-permission android:name="android.permission.INTERNET"\/>/' "$MANIFEST"
+          fi
+          grep -n "INTERNET" "$MANIFEST"
 
       - run: flutter pub get
 
